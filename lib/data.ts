@@ -82,6 +82,50 @@ export const achievements = [
       { k: "SLA", v: "Maintained 99.95%" },
     ],
   },
+  {
+    title: "Eliminated Node.js Event Loop Blocking & OOM Kills",
+    challenge: "A high-throughput Node.js service suffered event loop lag of ~3 seconds under peak load, leading to health-check failures and recurring OOM kills (pod restarts) that broke SLAs.",
+    investigation: "Correlated event loop lag, RSS/heap growth and CPU profiles (clinic.js, --prof, heap snapshots). Root cause: large synchronous JSON serialization and unbounded in-memory accumulation blocking the single-threaded loop while heap climbed toward the container memory limit.",
+    resolution: "Offloaded CPU-bound work to worker threads, switched to streaming/async serialization, bounded in-flight buffers with backpressure, and right-sized heap (--max-old-space-size) against pod limits.",
+    outcome: [
+      { k: "Event Loop Lag", v: "3s to 500ms" },
+      { k: "OOM Kills", v: "Eliminated" },
+      { k: "P95 Latency", v: "-68%" },
+    ],
+  },
+  {
+    title: "Resolved Solace Message Consumption Lag",
+    challenge: "Solace queue depth grew continuously during peak load as consumers fell behind, causing multi-minute backlog and downstream SLA breaches.",
+    investigation: "Profiled consumer flow, acknowledgement mode and max-unacked (prefetch) window. Found single-threaded, client-ack consumption with blocking handlers throttling the flow window and serializing throughput.",
+    resolution: "Scaled consumer concurrency, tuned flow window / max-unacked-messages, batched acknowledgements, and made handlers non-blocking with bounded parallelism.",
+    outcome: [
+      { k: "Queue Backlog", v: "Cleared" },
+      { k: "Consumption Rate", v: "+4x" },
+      { k: "End-to-End Delay", v: "Minutes to seconds" },
+    ],
+  },
+  {
+    title: "Identified Missing Database Indexes",
+    challenge: "Key API endpoints degraded sharply as data volume grew, with database CPU saturating during peak traffic.",
+    investigation: "Execution-plan analysis exposed full-table scans on high-cardinality filter and join columns lacking supporting indexes.",
+    resolution: "Recommended and validated composite indexes aligned to query predicates via EXPLAIN plans, then confirmed gains under load test.",
+    outcome: [
+      { k: "Query Time", v: "3.4s to 120ms" },
+      { k: "DB CPU", v: "-60%" },
+      { k: "Access Path", v: "Full scan to index seek" },
+    ],
+  },
+  {
+    title: "Optimized Frontend Page Load & Core Web Vitals",
+    challenge: "Customer-facing pages had slow first render and poor Core Web Vitals, with heavy JS bundles hurting conversion on mobile.",
+    investigation: "Lighthouse and WebPageTest profiling revealed render-blocking scripts, oversized bundles, unoptimized images and layout shift from late-loading assets.",
+    resolution: "Introduced code-splitting and lazy loading, deferred non-critical JS, optimized/served next-gen images, and added caching + preloading of critical assets.",
+    outcome: [
+      { k: "LCP", v: "5.8s to 1.9s" },
+      { k: "JS Bundle", v: "-45%" },
+      { k: "Lighthouse Perf", v: "48 to 94" },
+    ],
+  },
 ];
 
 export const caseStudies = [
