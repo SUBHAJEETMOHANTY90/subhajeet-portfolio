@@ -1,0 +1,40 @@
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: light dark; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  @apply bg-white text-slate-800 dark:bg-secondary dark:text-slate-200 antialiased;
+}
+
+.container-page { @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8; }
+
+.section { @apply py-16 sm:py-20; }
+
+.card {
+  @apply rounded-2xl border border-slate-200 bg-white/70 p-6 shadow-card backdrop-blur
+  dark:border-white/10 dark:bg-white/5;
+}
+
+.gradient-text {
+  @apply bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition;
+}
+.btn-primary { @apply btn bg-primary text-white hover:bg-primary-600 shadow-glow; }
+.btn-ghost { @apply btn border border-slate-300 text-slate-700 hover:border-primary hover:text-primary dark:border-white/15 dark:text-slate-200; }
+
+.chip { @apply inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-300; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { @apply rounded-full bg-slate-300 dark:bg-white/15; }
+
+.grid-bg {
+  background-image: radial-gradient(circle at 1px 1px, rgba(56,189,248,0.15) 1px, transparent 0);
+  background-size: 28px 28px;
+}
