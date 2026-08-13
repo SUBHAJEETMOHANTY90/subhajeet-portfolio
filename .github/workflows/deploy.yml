@@ -28,12 +28,15 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Configure GitHub Pages
         id: pages
         uses: actions/configure-pages@v5
+        with:
+          # Attempt to enable GitHub Pages automatically if it isn't already
+          enablement: true
 
       - name: Install dependencies
         run: npm ci
