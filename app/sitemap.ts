@@ -2,7 +2,7 @@
 import { navLinks } from "@/lib/data";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://subhajeet-portfolio.vercel.app";
+  const base = "https://subhajeetmohanty90.github.io/subhajeet-portfolio";
   return navLinks.map((l) => ({
     url: `${base}${l.href === "/" ? "" : l.href}`,
     lastModified: new Date(),

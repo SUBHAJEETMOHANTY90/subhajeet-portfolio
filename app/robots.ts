@@ -3,6 +3,6 @@
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: { userAgent: "*", allow: "/" },
-    sitemap: "https://subhajeet-portfolio.vercel.app/sitemap.xml",
+    sitemap: "https://subhajeetmohanty90.github.io/subhajeet-portfolio/sitemap.xml",
   };
 }
