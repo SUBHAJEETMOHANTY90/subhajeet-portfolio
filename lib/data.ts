@@ -59,6 +59,7 @@ export const achievements = [
     challenge: "SAP CAR (Customer Activity Repository) inbound POS processing and near-real-time inventory (BOPIS/omnichannel) fell behind during peak sale events, delaying stock accuracy and demand data.",
     investigation: "Traced POSDTA/POSDM inbound queues, HANA CPU and long-running aggregations, plus batch overlap with online journeys. Identified serialized inbound processing and unpartitioned high-volume tables as the bottleneck.",
     resolution: "Parallelized inbound task processing, tuned package sizes and HANA workload classes, rescheduled/decoupled heavy batch from peak windows, and validated with production-representative workload models.",
+    fix: "Parallelized POS inbound and moved heavy batch out of the peak window — so real-time inventory stopped queuing.",
     outcome: [
       { k: "Inbound Backlog", v: "Cleared at peak" },
       { k: "Inventory Freshness", v: "Near real-time" },
@@ -70,6 +71,7 @@ export const achievements = [
     challenge: "Containerized retail microservices on Kubernetes were both over-provisioned off-peak and unstable at peak, with pods hitting CPU throttling and OOMKilled restarts during flash sales.",
     investigation: "Analyzed CPU throttling (CFS), memory working set vs. limits, HPA reaction lag and readiness/liveness behavior against real traffic ramps from load tests and observability data.",
     resolution: "Right-sized requests/limits from actual usage, tuned HPA (target utilization, stabilization windows) and added pre-scaling for known sale windows, plus PodDisruptionBudgets for safe rollout under load.",
+    fix: "Right-sized CPU/memory limits and pre-scaled before sale windows — so pods stopped throttling and getting OOMKilled.",
     outcome: [
       { k: "OOMKills / Throttling", v: "Eliminated at peak" },
       { k: "Scale-up Lag", v: "Minutes to seconds" },
@@ -81,6 +83,7 @@ export const achievements = [
     challenge: "A core Java (Spring Boot) service showed periodic multi-second response spikes under sustained load, traced to long GC pauses and rising old-gen occupancy.",
     investigation: "GC log and heap analysis (JFR, VisualVM) showed frequent long pauses and premature promotion driven by an oversized short-lived allocation rate and undersized young generation.",
     resolution: "Switched to G1GC with tuned pause targets and region/young sizing, reduced allocation churn in hot paths, and bounded caches to stabilize old-gen growth.",
+    fix: "Moved to G1GC with a pause target and cut allocation churn in hot paths — so multi-second GC spikes disappeared.",
     outcome: [
       { k: "GC Pause (P99)", v: "2.1s to ~200ms" },
       { k: "Response Spikes", v: "Eliminated" },
@@ -92,6 +95,7 @@ export const achievements = [
     challenge: "A high-throughput Node.js service suffered event loop lag of ~3 seconds under peak load, leading to health-check failures and recurring OOM kills (pod restarts) that broke SLAs.",
     investigation: "Correlated event loop lag, RSS/heap growth and CPU profiles (clinic.js, --prof, heap snapshots). Root cause: large synchronous JSON serialization and unbounded in-memory accumulation blocking the single-threaded loop while heap climbed toward the container memory limit.",
     resolution: "Offloaded CPU-bound work to worker threads, switched to streaming/async serialization, bounded in-flight buffers with backpressure, and right-sized heap (--max-old-space-size) against pod limits.",
+    fix: "Offloaded blocking JSON work to worker threads and added backpressure — so the event loop stayed responsive and heap stopped hitting the OOM limit.",
     outcome: [
       { k: "Event Loop Lag", v: "3s to 500ms" },
       { k: "OOM Kills", v: "Eliminated" },
@@ -103,6 +107,7 @@ export const achievements = [
     challenge: "Solace queue depth grew continuously during peak load as consumers fell behind, causing multi-minute backlog and downstream SLA breaches.",
     investigation: "Profiled consumer flow, acknowledgement mode and max-unacked (prefetch) window. Found single-threaded, client-ack consumption with blocking handlers throttling the flow window and serializing throughput.",
     resolution: "Scaled consumer concurrency, tuned flow window / max-unacked-messages, batched acknowledgements, and made handlers non-blocking with bounded parallelism.",
+    fix: "Raised consumer concurrency and the max-unacked window with batched acks — so consumers kept pace and the queue drained.",
     outcome: [
       { k: "Queue Backlog", v: "Cleared" },
       { k: "Consumption Rate", v: "+4x" },
@@ -114,6 +119,7 @@ export const achievements = [
     challenge: "Key API endpoints degraded sharply as data volume grew, with database CPU saturating during peak traffic.",
     investigation: "Execution-plan analysis exposed full-table scans on high-cardinality filter and join columns lacking supporting indexes.",
     resolution: "Recommended and validated composite indexes aligned to query predicates via EXPLAIN plans, then confirmed gains under load test.",
+    fix: "Added composite indexes matching the query predicates — so full-table scans became index seeks and DB CPU dropped.",
     outcome: [
       { k: "Query Time", v: "3.4s to 120ms" },
       { k: "DB CPU", v: "-60%" },
@@ -125,10 +131,23 @@ export const achievements = [
     challenge: "Customer-facing pages had slow first render and poor Core Web Vitals, with heavy JS bundles hurting conversion on mobile.",
     investigation: "Lighthouse and WebPageTest profiling revealed render-blocking scripts, oversized bundles, unoptimized images and layout shift from late-loading assets.",
     resolution: "Introduced code-splitting and lazy loading, deferred non-critical JS, optimized/served next-gen images, and added caching + preloading of critical assets.",
+    fix: "Code-split the bundle and deferred non-critical JS while preloading critical assets — so first render and LCP improved sharply.",
     outcome: [
       { k: "LCP", v: "5.8s to 1.9s" },
       { k: "JS Bundle", v: "-45%" },
       { k: "Lighthouse Perf", v: "48 to 94" },
+    ],
+  },
+  {
+    title: "Built a Reusable Performance Engineering Template",
+    challenge: "Every project reinvented performance testing from scratch — inconsistent scripts, ad-hoc monitoring and manual reports slowed delivery and made results hard to compare across teams.",
+    investigation: "Reviewed recurring effort across engagements and found the same building blocks repeated: workload modelling, parameterized test scripts, monitoring dashboards, CI/CD wiring and stakeholder reporting.",
+    resolution: "Created a reusable framework — parameterized JMeter/Gatling/k6 test templates, standard workload-model definitions, ready-made Grafana/Dynatrace dashboards, CI/CD pipeline steps (Jenkins/Azure DevOps/GitHub Actions) and an AI-assisted report generator that summarizes results, flags anomalies and drafts release-readiness reports.",
+    fix: "Packaged the whole test-to-report flow into reusable templates plus AI-assisted reporting — so new projects start in hours, not weeks, with consistent, comparable results.",
+    outcome: [
+      { k: "Test Setup Time", v: "Weeks to hours" },
+      { k: "Reporting Effort", v: "Largely automated" },
+      { k: "Consistency", v: "Standard across teams" },
     ],
   },
 ];

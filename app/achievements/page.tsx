@@ -25,6 +25,9 @@ export default function AchievementsPage() {
                     <p className="mt-3 text-sm"><span className="font-semibold">Challenge:</span> {a.challenge}</p>
                     <p className="mt-2 text-sm"><span className="font-semibold">Investigation:</span> {a.investigation}</p>
                     <p className="mt-2 text-sm"><span className="font-semibold">Resolution:</span> {a.resolution}</p>
+                    <p className="mt-3 rounded-xl border-l-4 border-accent bg-accent/5 px-3 py-2 text-sm italic text-slate-700 dark:text-slate-200">
+                      <span className="font-semibold not-italic">The fix:</span> {a.fix}
+                    </p>
                     <div className="mt-4 space-y-1">
                       {a.outcome.map((o) => (
                         <p key={o.k} className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300 sm:justify-start">
