@@ -12,7 +12,7 @@
   philosophy:
     "Performance is not about making systems faster; it is about ensuring business reliability at scale.",
   summary:
-    "Senior Performance Engineer with 12 years of experience improving the reliability, scalability and user experience of business-critical applications across banking, retail, e-commerce, cloud, API, microservices and enterprise platforms. Skilled in performance testing, workload modelling, SLA/NFR validation, observability, bottleneck analysis and CI/CD-based performance checks. Hands-on with JMeter, LoadRunner, Gatling, k6, Dynatrace, AppDynamics, Splunk, Grafana, Prometheus, Azure Application Insights, Lighthouse and JVM diagnostics — and increasingly applying AI-assisted analysis and reporting to accelerate root-cause insight and release-readiness decisions.",
+    "Senior Performance Engineer with 12 years of experience improving the reliability, scalability and user experience of business-critical applications across banking, retail, e-commerce, cloud, API, microservices and enterprise platforms. Skilled in performance testing, workload modelling, SLA/NFR validation, observability, bottleneck analysis and CI/CD-based performance checks. Hands-on with JMeter, LoadRunner, k6, Dynatrace, AppDynamics, Splunk, Grafana, Prometheus, Azure Application Insights, Lighthouse and JVM diagnostics — and increasingly applying AI-assisted analysis and reporting to accelerate root-cause insight and release-readiness decisions.",
 };
 
 export const stats = [
@@ -31,7 +31,7 @@ export const businessImpact = [
 ];
 
 export const skillCategories = [
-  { category: "Performance Testing", items: ["JMeter", "LoadRunner", "Gatling", "k6", "Robot Framework", "BlazeMeter"] },
+  { category: "Performance Testing", items: ["JMeter", "LoadRunner", "k6", "Robot Framework", "BlazeMeter"] },
   { category: "Monitoring & Observability", items: ["Dynatrace", "AppDynamics", "Splunk", "Grafana", "Prometheus", "Azure App Insights"] },
   { category: "Frontend & Web Performance", items: ["Lighthouse", "WebPageTest", "Core Web Vitals", "React.js journeys", "Browser DevTools"] },
   { category: "JVM & App Diagnostics", items: ["GC Analysis", "Heap Dumps", "Thread Dumps", "Java Flight Recorder", "VisualVM"] },
@@ -142,7 +142,7 @@ export const achievements = [
     title: "Built a Reusable Performance Engineering Template",
     challenge: "Every project reinvented performance testing from scratch — inconsistent scripts, ad-hoc monitoring and manual reports slowed delivery and made results hard to compare across teams.",
     investigation: "Reviewed recurring effort across engagements and found the same building blocks repeated: workload modelling, parameterized test scripts, monitoring dashboards, CI/CD wiring and stakeholder reporting.",
-    resolution: "Created a reusable framework — parameterized JMeter/Gatling/k6 test templates, standard workload-model definitions, ready-made Grafana/Dynatrace dashboards, CI/CD pipeline steps (Jenkins/Azure DevOps/GitHub Actions) and an AI-assisted report generator that summarizes results, flags anomalies and drafts release-readiness reports.",
+    resolution: "Created a reusable framework — parameterized JMeter/k6 test templates, standard workload-model definitions, ready-made Grafana/Dynatrace dashboards, CI/CD pipeline steps (Jenkins/Azure DevOps/GitHub Actions) and an AI-assisted report generator that summarizes results, flags anomalies and drafts release-readiness reports.",
     fix: "Packaged the whole test-to-report flow into reusable templates plus AI-assisted reporting — so new projects start in hours, not weeks, with consistent, comparable results.",
     outcome: [
       { k: "Test Setup Time", v: "Weeks to hours" },
@@ -262,7 +262,7 @@ export const workHistory = [
     points: [
       "Lead performance engineering for large-scale retail, e-commerce, API, microservices, SAP Hybris/CAR, BOPIS, cloud and data-platform systems.",
       "Define NFRs, SLA/SLO expectations, workload models, transaction mixes and release-readiness benchmarks.",
-      "Run load, stress, soak, spike, scalability, endurance and failover tests with JMeter, LoadRunner, Gatling, k6 and Robot Framework.",
+      "Run load, stress, soak, spike, scalability, endurance and failover tests with JMeter, LoadRunner, k6 and Robot Framework.",
       "Analyse frontend/React.js journeys with Lighthouse, WebPageTest and observability data to isolate rendering, latency and caching bottlenecks.",
       "Perform JVM diagnostics (GC logs, heap/thread dumps, Java Flight Recorder, VisualVM) and provide tuning recommendations.",
       "Built AI-assisted reporting to summarise results, highlight anomalies, compare trends and prepare release-readiness reports.",
@@ -277,7 +277,7 @@ export const workHistory = [
     points: [
       "Led performance delivery for enterprise, API, frontend, backend, cloud and data-heavy workflows.",
       "Prepared NFRs, workload models, test strategies, execution plans and reporting structures.",
-      "Designed and executed tests with JMeter, LoadRunner, Gatling, BlazeMeter, Robot Framework, WebPageTest and Lighthouse.",
+      "Designed and executed tests with JMeter, LoadRunner, BlazeMeter, Robot Framework, WebPageTest and Lighthouse.",
       "Integrated performance testing into Azure DevOps and Jenkins pipelines for repeatable validation and regression detection.",
       "Used Dynatrace, AppDynamics, Grafana, Prometheus, Splunk and Azure App Insights for bottleneck analysis and readiness reviews.",
       "Mentored engineers and contributed to the performance Centre of Excellence.",
