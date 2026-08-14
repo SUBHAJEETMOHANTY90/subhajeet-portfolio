@@ -296,11 +296,9 @@ export const education = [
 ];
 
 export const certifications = [
-  { name: "AWS Certified Solutions Architect - Associate", org: "Amazon Web Services", date: "2024", credentialId: "AWS-SAA-2024-XXXX", file: "/certs/aws-saa.pdf" },
-  { name: "Dynatrace Associate", org: "Dynatrace", date: "2023", credentialId: "DT-ASSOC-2023-XXXX", file: "/certs/dynatrace.pdf" },
-  { name: "Micro Focus LoadRunner Professional", org: "Micro Focus", date: "2022", credentialId: "LR-PRO-2022-XXXX", file: "/certs/loadrunner.pdf" },
-  { name: "Certified Kubernetes Administrator (CKA)", org: "CNCF / Linux Foundation", date: "2023", credentialId: "CKA-2023-XXXX", file: "/certs/cka.pdf" },
-  { name: "Microsoft Certified: Azure Fundamentals", org: "Microsoft", date: "2021", credentialId: "AZ-900-2021-XXXX", file: "/certs/azure.pdf" },
+  { name: "ISTQB Certified Tester", org: "ISTQB", date: "", credentialId: "", file: "" },
+  { name: "Microsoft Certified: Azure Fundamentals (AZ-900)", org: "Microsoft", date: "", credentialId: "", file: "" },
+  { name: "Microsoft Certified: Azure Administrator Associate (AZ-104)", org: "Microsoft", date: "", credentialId: "", file: "" },
 ];
 
 export const successStories = [

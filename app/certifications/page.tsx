@@ -18,9 +18,9 @@ export default function CertificationsPage() {
                 <div className="grid h-12 w-12 place-items-center rounded-xl bg-primary/10 text-primary"><Award className="h-6 w-6" /></div>
                 <h3 className="mt-4 font-semibold">{c.name}</h3>
                 <p className="mt-1 text-sm text-primary">{c.org}</p>
-                <p className="mt-1 text-xs text-slate-500">Issued {c.date}</p>
-                <p className="mt-1 text-xs text-slate-500">Credential ID: {c.credentialId}</p>
-                <a href={c.file} download className="btn-ghost mt-4 w-fit"><Download className="h-4 w-4" /> Certificate</a>
+                {c.date && <p className="mt-1 text-xs text-slate-500">Issued {c.date}</p>}
+                {c.credentialId && <p className="mt-1 text-xs text-slate-500">Credential ID: {c.credentialId}</p>}
+                {c.file && <a href={c.file} download className="btn-ghost mt-4 w-fit"><Download className="h-4 w-4" /> Certificate</a>}
               </div>
             </Reveal>
           ))}

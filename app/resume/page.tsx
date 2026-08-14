@@ -120,7 +120,7 @@ export default function ResumePage() {
                 <ul className="mt-3 grid gap-1.5 sm:grid-cols-2">
                   {certifications.map((c) => (
                     <li key={c.name} className="text-sm text-slate-600 dark:text-slate-400">
-                      <span className="font-medium text-slate-800 dark:text-slate-200">{c.name}</span> — {c.org} ({c.date})
+                      <span className="font-medium text-slate-800 dark:text-slate-200">{c.name}</span> — {c.org}{c.date ? ` (${c.date})` : ""}
                     </li>
                   ))}
                 </ul>
