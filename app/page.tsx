@@ -12,12 +12,12 @@ export default function Home() {
       <section className="relative overflow-hidden grid-bg">
         <div className="container-page flex flex-col items-center gap-10 pt-32 pb-16 sm:pt-40 lg:flex-row lg:justify-between">
           <Reveal className="max-w-2xl">
-            <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-accent">Performance Engineering</p>
+            <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-accent">Reliability · Scalability · AI-Driven Optimization</p>
             <h1 className="text-4xl font-bold leading-tight sm:text-6xl">{profile.name}</h1>
             <p className="mt-3 text-xl font-semibold text-primary">{profile.title}</p>
             <p className="mt-5 max-w-xl text-lg text-slate-600 dark:text-slate-400">&quot;{profile.tagline}&quot;</p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href={profile.resume} download className="btn-primary"><Download className="h-4 w-4" /> Download Resume</a>
+              <Link href="/resume" className="btn-primary"><Download className="h-4 w-4" /> View Resume</Link>
               <a href={profile.linkedin} target="_blank" rel="noreferrer" className="btn-ghost"><Linkedin className="h-4 w-4" /> LinkedIn</a>
               <a href={profile.github} target="_blank" rel="noreferrer" className="btn-ghost"><Github className="h-4 w-4" /> GitHub</a>
               <Link href="/contact" className="btn-ghost"><Mail className="h-4 w-4" /> Contact Me</Link>

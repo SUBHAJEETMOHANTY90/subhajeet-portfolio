@@ -38,3 +38,22 @@ body {
   background-image: radial-gradient(circle at 1px 1px, rgba(56,189,248,0.15) 1px, transparent 0);
   background-size: 28px 28px;
 }
+
+/* Print / Save-as-PDF styles: show only the resume sheet */
+@media print {
+  nav, footer, .no-print { display: none !important; }
+  body { background: #fff !important; color: #000 !important; }
+  .section { padding: 0 !important; }
+  #resume-sheet {
+    max-width: none !important;
+    margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    color: #000 !important;
+    padding: 0 !important;
+  }
+  #resume-sheet * { color: #000 !important; }
+  @page { margin: 16mm; }
+}
+

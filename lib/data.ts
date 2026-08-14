@@ -1,21 +1,22 @@
 ﻿export const profile = {
   name: "Subhajeet Mohanty",
-  title: "Performance Engineering Engineer",
+  title: "Senior Performance Engineer",
   tagline: "Transforming performance bottlenecks into scalable business solutions.",
-  location: "Pune, India",
-  email: "subhajeet.mohanty@example.com",
+  location: "Pune, Maharashtra, India",
+  email: "subhajeetmohanty333@gmail.com",
+  phone: "+91-9960119555",
   linkedin: "https://www.linkedin.com/in/subhajeet-mohanty",
-  github: "https://github.com/subhajeet-mohanty",
+  github: "https://github.com/SUBHAJEETMOHANTY90",
   resume: "/resume.pdf",
   photo: "/profile.jpg",
   philosophy:
     "Performance is not about making systems faster; it is about ensuring business reliability at scale.",
   summary:
-    "Performance Engineering professional specializing in load testing, capacity planning, scalability engineering and application performance monitoring for enterprise banking and retail platforms. I turn complex production bottlenecks into measurable business outcomes across cloud-native and legacy systems.",
+    "Senior Performance Engineer with 12 years of experience improving the reliability, scalability and user experience of business-critical applications across banking, retail, e-commerce, cloud, API, microservices and enterprise platforms. Skilled in performance testing, workload modelling, SLA/NFR validation, observability, bottleneck analysis and CI/CD-based performance checks. Hands-on with JMeter, LoadRunner, Gatling, k6, Dynatrace, AppDynamics, Splunk, Grafana, Prometheus, Azure Application Insights, Lighthouse and JVM diagnostics — and increasingly applying AI-assisted analysis and reporting to accelerate root-cause insight and release-readiness decisions.",
 };
 
 export const stats = [
-  { label: "Years of Experience", value: 8, suffix: "+" },
+  { label: "Years of Experience", value: 12, suffix: "+" },
   { label: "Projects Delivered", value: 45, suffix: "+" },
   { label: "Load Tests Executed", value: 1200, suffix: "+" },
   { label: "Performance Issues Resolved", value: 380, suffix: "+" },
@@ -30,11 +31,15 @@ export const businessImpact = [
 ];
 
 export const skillCategories = [
-  { category: "Performance Testing", items: ["JMeter", "LoadRunner", "Gatling", "NeoLoad"] },
-  { category: "Monitoring & Observability", items: ["Dynatrace", "AppDynamics", "Splunk", "Grafana", "ELK"] },
-  { category: "Cloud & DevOps", items: ["AWS", "Azure", "Docker", "Kubernetes"] },
-  { category: "Backend Technologies", items: ["Java", "Spring Boot", "REST APIs", "Microservices"] },
-  { category: "Databases", items: ["Oracle", "MSSQL", "PostgreSQL", "MongoDB"] },
+  { category: "Performance Testing", items: ["JMeter", "LoadRunner", "Gatling", "k6", "Robot Framework", "BlazeMeter"] },
+  { category: "Monitoring & Observability", items: ["Dynatrace", "AppDynamics", "Splunk", "Grafana", "Prometheus", "Azure App Insights"] },
+  { category: "Frontend & Web Performance", items: ["Lighthouse", "WebPageTest", "Core Web Vitals", "React.js journeys", "Browser DevTools"] },
+  { category: "JVM & App Diagnostics", items: ["GC Analysis", "Heap Dumps", "Thread Dumps", "Java Flight Recorder", "VisualVM"] },
+  { category: "CI/CD & Automation", items: ["Jenkins", "Azure DevOps", "GitHub Actions", "CI/CD Perf Gates"] },
+  { category: "Programming & Scripting", items: ["Java", "JavaScript", "Python", "PowerShell"] },
+  { category: "Cloud & Infrastructure", items: ["Azure", "Kubernetes", "Linux/Windows VMs", "Containerized Workloads"] },
+  { category: "Databases & Data", items: ["Oracle", "Azure Cosmos DB", "Azure Data Lake", "Big Data Workloads"] },
+  { category: "AI for Performance", items: ["LLM-Assisted Reporting", "Automated Executive Summaries", "Anomaly Highlighting", "Trend Comparison"] },
 ];
 
 export const experience = [
@@ -227,6 +232,67 @@ export const warStories = [
     actions: "Introduced batching, caching and request coalescing.",
     outcome: "End-to-end latency reduced by 62%.",
   },
+];
+
+export const workHistory = [
+  {
+    company: "Tata Consultancy Services",
+    role: "Senior Performance Engineer / Technical Consultant",
+    client: "H&M Core Engineering",
+    period: "Dec 2021 – Present",
+    points: [
+      "Lead performance engineering for large-scale retail, e-commerce, API, microservices, SAP Hybris/CAR, BOPIS, cloud and data-platform systems.",
+      "Define NFRs, SLA/SLO expectations, workload models, transaction mixes and release-readiness benchmarks.",
+      "Run load, stress, soak, spike, scalability, endurance and failover tests with JMeter, LoadRunner, Gatling, k6 and Robot Framework.",
+      "Analyse frontend/React.js journeys with Lighthouse, WebPageTest and observability data to isolate rendering, latency and caching bottlenecks.",
+      "Perform JVM diagnostics (GC logs, heap/thread dumps, Java Flight Recorder, VisualVM) and provide tuning recommendations.",
+      "Built AI-assisted reporting to summarise results, highlight anomalies, compare trends and prepare release-readiness reports.",
+      "Mentor performance engineers and contribute to Community of Practice standards.",
+    ],
+  },
+  {
+    company: "Cybage Software",
+    role: "Lead Performance Engineer",
+    client: "TechData",
+    period: "Dec 2018 – Dec 2021",
+    points: [
+      "Led performance delivery for enterprise, API, frontend, backend, cloud and data-heavy workflows.",
+      "Prepared NFRs, workload models, test strategies, execution plans and reporting structures.",
+      "Designed and executed tests with JMeter, LoadRunner, Gatling, BlazeMeter, Robot Framework, WebPageTest and Lighthouse.",
+      "Integrated performance testing into Azure DevOps and Jenkins pipelines for repeatable validation and regression detection.",
+      "Used Dynatrace, AppDynamics, Grafana, Prometheus, Splunk and Azure App Insights for bottleneck analysis and readiness reviews.",
+      "Mentored engineers and contributed to the performance Centre of Excellence.",
+    ],
+  },
+  {
+    company: "Softenger",
+    role: "Senior Performance Engineer",
+    client: "ICICI Banking System",
+    period: "Apr 2017 – Dec 2018",
+    points: [
+      "Delivered end-to-end performance testing and tuning for banking, payment, API, web service and backend systems.",
+      "Created and executed JMeter and LoadRunner scripts for UI, API, web service and payment workflows.",
+      "Supported validation in a regulated banking environment focused on stability, reliability and throughput.",
+      "Performed JVM diagnostics (GC, heap/thread dumps) and production stability support.",
+    ],
+  },
+  {
+    company: "Sparken IT Solutions Pvt. Ltd",
+    role: "Performance Engineer",
+    client: "",
+    period: "Sep 2014 – Apr 2017",
+    points: [
+      "Performed UI, API and mobile service performance testing with JMeter across web and service-based applications.",
+      "Supported regression automation with Selenium and contributed to execution planning and result validation.",
+      "Analysed logs with Splunk and prepared KPI/benchmark reports; supported Java profiling under load.",
+    ],
+  },
+];
+
+export const education = [
+  { school: "BRM Institute of Engineering and Technology, Bhubaneswar, Odisha", qualification: "B.Tech, Computer Science", period: "2009 – 2013" },
+  { school: "NIIS Junior College, Bhubaneswar", qualification: "Higher Secondary", period: "2007 – 2009" },
+  { school: "K.P.S, Jamshedpur", qualification: "Senior Secondary", period: "2005 – 2007" },
 ];
 
 export const certifications = [
