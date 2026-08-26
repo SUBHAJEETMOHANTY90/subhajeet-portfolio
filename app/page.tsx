@@ -1,5 +1,5 @@
 ﻿import Link from "next/link";
-import { Download, Linkedin, Github, Mail, ArrowRight, Gauge, TrendingUp, Layers, DollarSign } from "lucide-react";
+import { Download, Linkedin, Mail, ArrowRight, Gauge, TrendingUp, Layers, DollarSign } from "lucide-react";
 import { profile, stats, businessImpact } from "@/lib/data";
 import { Counter } from "@/components/Counter";
 import { Reveal } from "@/components/Reveal";
@@ -19,7 +19,6 @@ export default function Home() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/resume" className="btn-primary"><Download className="h-4 w-4" /> View Resume</Link>
               <a href={profile.linkedin} target="_blank" rel="noreferrer" className="btn-ghost"><Linkedin className="h-4 w-4" /> LinkedIn</a>
-              <a href={profile.github} target="_blank" rel="noreferrer" className="btn-ghost"><Github className="h-4 w-4" /> GitHub</a>
               <Link href="/contact" className="btn-ghost"><Mail className="h-4 w-4" /> Contact Me</Link>
             </div>
           </Reveal>

@@ -1,5 +1,5 @@
 ﻿import Link from "next/link";
-import { Linkedin, Github, Download, Mail, MapPin } from "lucide-react";
+import { Linkedin, Download, Mail, MapPin } from "lucide-react";
 import { profile } from "@/lib/data";
 
 export function Footer() {
@@ -26,7 +26,6 @@ export function Footer() {
           <h4 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-500">Connect</h4>
           <div className="flex flex-wrap gap-3">
             <a href={profile.linkedin} target="_blank" rel="noreferrer" className="btn-ghost"><Linkedin className="h-4 w-4" /> LinkedIn</a>
-            <a href={profile.github} target="_blank" rel="noreferrer" className="btn-ghost"><Github className="h-4 w-4" /> GitHub</a>
             <a href={profile.resume} download className="btn-ghost"><Download className="h-4 w-4" /> Resume</a>
             <a href={`mailto:${profile.email}`} className="btn-ghost"><Mail className="h-4 w-4" /> Email</a>
           </div>

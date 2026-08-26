@@ -3,7 +3,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { Reveal } from "@/components/Reveal";
 import { PrintButton } from "@/components/PrintButton";
 import { profile, skillCategories, certifications, achievements, stats, experience, workHistory, education } from "@/lib/data";
-import { Mail, MapPin, Linkedin, Github } from "lucide-react";
+import { Mail, MapPin, Linkedin } from "lucide-react";
 
 export const metadata: Metadata = { title: "Resume", description: "View and download the resume of " + profile.name };
 
@@ -30,7 +30,6 @@ export default function ResumePage() {
                   <span className="inline-flex items-center gap-1"><Mail className="h-4 w-4" /> {profile.email}</span>
                   <span className="inline-flex items-center gap-1"><MapPin className="h-4 w-4" /> {profile.location}</span>
                   <a href={profile.linkedin} className="inline-flex items-center gap-1 hover:text-primary"><Linkedin className="h-4 w-4" /> LinkedIn</a>
-                  <a href={profile.github} className="inline-flex items-center gap-1 hover:text-primary"><Github className="h-4 w-4" /> GitHub</a>
                 </div>
               </header>
 

@@ -6,7 +6,6 @@
   email: "subhajeetmohanty333@gmail.com",
   phone: "+91-9960119555",
   linkedin: "https://www.linkedin.com/in/subhajeet-mohanty",
-  github: "https://github.com/SUBHAJEETMOHANTY90",
   resume: "/resume.pdf",
   photo: "/profile.jpg",
   philosophy:
@@ -17,9 +16,9 @@
 
 export const stats = [
   { label: "Years of Experience", value: 12, suffix: "+" },
-  { label: "Projects Delivered", value: 45, suffix: "+" },
+  { label: "Projects Delivered", value: 30, suffix: "+" },
   { label: "Load Tests Executed", value: 1200, suffix: "+" },
-  { label: "Performance Issues Resolved", value: 380, suffix: "+" },
+  { label: "Performance Issues Resolved", value: 150, suffix: "+" },
   { label: "Applications Optimized", value: 60, suffix: "+" },
 ];
 
