@@ -52,6 +52,28 @@ export const experience = [
   { role: "Retail Platforms", desc: "Peak-event readiness for high-traffic e-commerce systems." },
 ];
 
+export const about = {
+  headline: "I find the bottleneck everyone else missed — then make sure it never comes back.",
+  bio: [
+    "I'm a Senior Performance Engineer with 12 years spent making business-critical systems fast, stable and predictable under pressure. My path runs from regulated banking platforms, through high-traffic retail and e-commerce (currently H&M's core engineering), into cloud-native, API and microservices architectures.",
+    "I love the moment a vague \"the app is slow\" complaint turns into a precise, measurable root cause — a blocked event loop, a starved connection pool, a missing index, a GC pause. Then I go one step further: turning that one fix into a reusable framework so the whole team ships performance, not just me.",
+    "Lately I've been applying AI-assisted analysis and reporting to accelerate root-cause insight, anomaly detection and release-readiness decisions — pairing deep systems fundamentals with modern tooling.",
+  ],
+  strengths: [
+    { title: "Deep Root-Cause Diagnosis", proof: "Traced a 3s Node.js event-loop stall to synchronous serialization — cut it to 500ms and eliminated OOM kills." },
+    { title: "Peak-Event Readiness", proof: "Tuned SAP CAR and Kubernetes autoscaling to sustain 3x sale-day volume without throttling or backlog." },
+    { title: "Reusable Performance Frameworks", proof: "Built a template + AI-assisted reporting that cut test setup from weeks to hours across teams." },
+    { title: "Full-Stack Performance", proof: "From JVM GC and DB indexes to frontend Core Web Vitals (LCP 5.8s to 1.9s) — the whole request path." },
+  ],
+  principles: [
+    "Measure, don't guess — every conclusion is backed by data.",
+    "Define the SLO before scaling the infrastructure.",
+    "Watch dispersion, not just averages — the mean hides the pain.",
+    "Make the fix reusable — a framework beats a one-off.",
+    "Translate deep findings into decisions everyone can act on.",
+  ],
+};
+
 export const achievements = [
   {
     title: "Scaled SAP CAR for Peak Retail Sale Events",
