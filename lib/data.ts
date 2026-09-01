@@ -314,9 +314,10 @@ export const education = [
 ];
 
 export const certifications = [
-  { name: "ISTQB Certified Tester", org: "ISTQB", date: "", credentialId: "", file: "" },
-  { name: "Microsoft Certified: Azure Fundamentals (AZ-900)", org: "Microsoft", date: "", credentialId: "", file: "" },
-  { name: "Microsoft Certified: Azure Administrator Associate (AZ-104)", org: "Microsoft", date: "", credentialId: "", file: "" },
+  { name: "Claude Builder Certification", org: "Anthropic", date: "2026", credentialId: "", file: "", badgeId: "1fa5e443-55ab-4bc1-badc-00b6639bc89f" },
+  { name: "ISTQB Certified Tester", org: "ISTQB", date: "", credentialId: "", file: "", badgeId: "" },
+  { name: "Microsoft Certified: Azure Fundamentals (AZ-900)", org: "Microsoft", date: "", credentialId: "", file: "", badgeId: "" },
+  { name: "Microsoft Certified: Azure Administrator Associate (AZ-104)", org: "Microsoft", date: "", credentialId: "", file: "", badgeId: "" },
 ];
 
 export const successStories = [

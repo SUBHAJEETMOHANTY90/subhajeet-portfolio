@@ -2,6 +2,7 @@
 import { PageHeader } from "@/components/PageHeader";
 import { Reveal } from "@/components/Reveal";
 import { certifications } from "@/lib/data";
+import { CredlyBadge } from "@/components/CredlyBadge";
 import { Award, Download } from "lucide-react";
 
 export const metadata: Metadata = { title: "Certifications", description: "Industry certifications in performance, cloud and observability." };
@@ -20,6 +21,11 @@ export default function CertificationsPage() {
                 <p className="mt-1 text-sm text-primary">{c.org}</p>
                 {c.date && <p className="mt-1 text-xs text-slate-500">Issued {c.date}</p>}
                 {c.credentialId && <p className="mt-1 text-xs text-slate-500">Credential ID: {c.credentialId}</p>}
+                {c.badgeId && (
+                  <div className="mt-4 flex justify-center rounded-xl bg-white p-3">
+                    <CredlyBadge badgeId={c.badgeId} />
+                  </div>
+                )}
                 {c.file && <a href={c.file} download className="btn-ghost mt-4 w-fit"><Download className="h-4 w-4" /> Certificate</a>}
               </div>
             </Reveal>
