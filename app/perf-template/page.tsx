@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/PageHeader";
 import { Reveal } from "@/components/Reveal";
+import { PerfArchitectureDiagram } from "@/components/PerfArchitectureDiagram";
 import {
   FolderTree,
   Sliders,
@@ -12,6 +13,8 @@ import {
   Gauge,
   CheckCircle2,
   Workflow,
+  Boxes,
+  ListChecks,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -280,63 +283,251 @@ k6 run scenarios/getEntityByCode/load-test.js \\
         <div className="container-page">
           <Reveal>
             <h2 className="flex items-center gap-2 text-2xl font-bold text-primary">
-              <GitBranch className="h-6 w-6 text-accent" /> 8. Make it on-demand in CI
+              <GitBranch className="h-6 w-6 text-accent" /> 8. Make it on-demand — the two-repo model
             </h2>
             <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-              Expose the same knobs as CI inputs so anyone can launch a run from a button —
-              choose environment, VUs, ramp-up and duration. Secrets stay in the secret store,
-              and a reusable action runs k6 <strong>inside the cluster</strong> (next to the
-              system under test) while streaming results to a time-series DB for dashboards.
+              The clever part: your product repo doesn&apos;t contain the heavy k8s logic. It
+              keeps only the <strong>k6 scripts</strong> plus a <strong>thin caller workflow</strong>,
+              and it <code>uses:</code> a shared <strong>reusable workflow</strong> that lives
+              in a second, central repo. That central repo owns all the cluster orchestration,
+              so every team gets the same battle-tested pipeline for free.
             </p>
+            <Code>{`Repo A — YOUR PRODUCT REPO                 Repo B — CENTRAL REUSABLE WORKFLOW
+────────────────────────────              ─────────────────────────────────────
+tests/k6/getEntityByCode/*.js             .github/workflows/workflow.yml
+.github/workflows/.dev-euwe.env           .github/workflows/k6-operator.yml
+.github/workflows/on-demand-perftest.yml  (owns cluster login + k6 orchestration)
+        │
+        │  uses: reusable workflow
+        ▼
+   calls Repo B ───────────────────────▶  runs everything below on your behalf`}</Code>
+
+            <p className="mt-6 text-sm font-semibold text-primary">Repo A — the thin caller (all you write):</p>
             <Code>{`name: On-demand performance test
 on:
   workflow_dispatch:
     inputs:
-      environment:  { type: choice,  options: [dev, sit, staging], required: true }
-      test-script:  { type: choice,  options: [smoke-test.js, sanity-test.js, load-test.js], default: smoke-test.js }
-      virtual-users:{ type: string,  default: "1",  required: true }
-      ramp-up:      { type: string,  default: "1m", required: true }
-      duration:     { type: string,  default: "10m", required: true }
-      think-time:   { type: string,  default: "1",  required: true }
+      environment-region: { type: choice, options: [dev-euwe, acc-euwe], default: dev-euwe }
+      test-script:        { type: choice, options: [smoke-test.js, sanity-test.js, load-test.js] }
+      virtual-users:      { type: string, default: "1" }
+      ramp-up:            { type: string, default: "1m" }
+      duration:           { type: string, default: "10m" }
+      think-time:         { type: string, default: "1" }
 
 jobs:
   perf:
-    runs-on: ubuntu-latest
-    environment: ${dollar}{{ inputs.environment }}
-    steps:
-      - uses: actions/checkout@v4
+    # 👇 hand off to the central reusable workflow — you inherit the whole pipeline
+    uses: your-org/perftest-reusable-workflow/.github/workflows/workflow.yml@v0
+    with:
+      environment-region: ${dollar}{{ inputs.environment-region }}
+      test-script:        ${dollar}{{ inputs.test-script }}
+      virtual-users:      ${dollar}{{ inputs.virtual-users }}
+      ramp-up:            ${dollar}{{ inputs.ramp-up }}
+      duration:           ${dollar}{{ inputs.duration }}
+      think-time:         ${dollar}{{ inputs.think-time }}
+      # extra per-request data (ids/keys) merged into the k6 data object
+      test-custom-data-object: '{"CLIENT_ID":"...","SUBSCRIPTION_KEY":"..."}'
+    secrets:
+      K6_SECRETS: ${dollar}{{ secrets.K6_SECRETS }}   # JSON blob of secrets for the script`}</Code>
 
-      # 1) pull env values + secrets for the chosen environment
-      - name: Load env
-        uses: your-org/export-dotenv@v1
-        with:
-          path: ./.github/workflows/.${dollar}{{ inputs.environment }}.env
+            <p className="mt-6 text-sm font-semibold text-primary">
+              Repo B — the reusable workflow (written once, shared by everyone):
+            </p>
+            <Code>{`on:
+  workflow_call:                     # ← this is what makes it reusable
+    inputs: { environment-region, test-script, virtual-users, ramp-up, duration, think-time, ... }
+    secrets: { K6_SECRETS }
+
+jobs:
+  performance-test:
+    runs-on: ubuntu-latest
+    concurrency: ${dollar}{{ inputs.environment-region }}   # one run per env at a time
+    environment: ${dollar}{{ inputs.environment-region }}
+    steps:
+      - uses: actions/checkout@v6                     # 1. checkout the CALLER's k6 scripts
+
+      - name: Load dotenv                             # 2. read .<env-region>.env →
+        uses: your-org/export-dotenv@v0               #    ARM_CLIENT_ID, AKS_REGION,
+        with:                                         #    AKS_TIER, AKS_NAMESPACE + secrets
+          path: ./.github/workflows/.${dollar}{{ inputs.environment-region }}.env
           secrets: ${dollar}{{ toJSON(secrets) }}
 
-      # 2) authenticate to the cluster that hosts the system under test
-      - name: Cluster login
-        uses: your-org/cluster-login@v1
-
-      # 3) run k6 IN-CLUSTER via a reusable action; stream results to InfluxDB → Grafana
-      - name: Run k6
-        uses: your-org/run-k6@v1
+      - name: Cluster login                           # 3. OIDC federated login to the
+        uses: your-org/cluster-login@v1               #    cluster (no static creds)
         with:
-          namespace:  ${dollar}{{ env.NAMESPACE }}
-          test-path:  perf/scenarios/getEntityByCode
+          client-id:     ${dollar}{{ env.ARM_CLIENT_ID }}
+          cluster-group: ${dollar}{{ env.AKS_REGION }}
+          cluster-tier:  ${dollar}{{ env.AKS_TIER }}
+
+      - name: Merge custom data                       # 4. fold knobs + secrets into ONE
+        run: |                                        #    JSON the k6 script will parse
+          echo 'test_custom_data={"VUS":"...","RAMPUP":"...","DURATION":"...","SLEEP":"...","K6_SECRETS":{...}}' >> $GITHUB_OUTPUT
+
+      - name: Run k6 test                             # 5. hand off to the runner action
+        uses: your-org/run-k6@v0                      #    which deploys the k6 POD
+        with:
+          namespace:   ${dollar}{{ env.AKS_NAMESPACE }}
+          test-path:   tests/k6
           test-script: ${dollar}{{ inputs.test-script }}
-          cpu-limit: "1000m"
-          memory-limit: "2000Mi"
-          influxdb: "influxdb.<cluster-internal>:8086/loadtest"
-          test-custom-data-object: |
-            {
-              "VUS":"${dollar}{{ inputs.virtual-users }}",
-              "RAMPUP":"${dollar}{{ inputs.ramp-up }}",
-              "DURATION":"${dollar}{{ inputs.duration }}",
-              "SLEEP":"${dollar}{{ inputs.think-time }}",
-              "CLIENT_ID":"${dollar}{{ vars.CLIENT_ID }}",
-              "CLIENT_SECRET":"${dollar}{{ secrets.CLIENT_SECRET }}",
-              "SUBSCRIPTION_KEY":"${dollar}{{ vars.SUBSCRIPTION_KEY }}"
-            }`}</Code>
+          cpu-limit: "250m"  memory-limit: "1000Mi"
+          test-custom-data-object: ${dollar}{{ steps.merge.outputs.test_custom_data }}
+          influxdb: "http://influxdb.<cluster-internal>:8086/loadtest"`}</Code>
+          </Reveal>
+        </div>
+
+
+        {/* Step 8b - deployment architecture */}
+        <div className="container-page">
+          <Reveal>
+            <div className="card border-l-4 border-primary">
+              <h2 className="flex items-center gap-2 text-2xl font-bold text-primary">
+                <Boxes className="h-6 w-6 text-accent" /> The complete architecture — request to result
+              </h2>
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                The workflow doesn&apos;t just run <code>k6</code> on the CI runner — the CI
+                runner is only the <em>conductor</em>. It logs into the cluster and asks a
+                runner action to <strong>deploy a k6 pod inside your namespace</strong>, which
+                sends traffic <strong>directly to your k8s Service in the same namespace</strong>{" "}
+                — bypassing the CDN and ingress so you measure <em>your service</em>, not the
+                internet. Here is the full path from a button click to a Grafana dashboard:
+              </p>
+
+              {/* Graphical diagram */}
+              <PerfArchitectureDiagram />
+
+              {/* Text version (copy-friendly) */}
+              <p className="mt-8 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Same flow, as text
+              </p>
+              <Code>{`┌──────────────────────────────────────────────────────────────────────┐
+│  1. TRIGGER  (Repo A — your product repo)                             │
+│  Engineer clicks "Run workflow" (workflow_dispatch)                    │
+│  → the caller job does: uses: Repo-B/workflow.yml@v0                   │
+└───────────────┬──────────────────────────────────────────────────────┘
+                ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│  2. REUSABLE WORKFLOW (Repo B) on an ephemeral ubuntu-latest runner   │
+│  a) checkout Repo A (to get its tests/k6 scripts)                     │
+│  b) load .<env-region>.env → ARM_CLIENT_ID, AKS_REGION, AKS_TIER,     │
+│                              AKS_NAMESPACE  (+ inject secrets)         │
+│  c) cluster login via OIDC federated identity (no static creds)       │
+│  d) merge knobs + K6_SECRETS → one CUSTOM_DATA_OBJECT JSON            │
+└───────────────┬──────────────────────────────────────────────────────┘
+                ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│  3. RUNNER ACTION  →  deploys a k6 POD into AKS_NAMESPACE            │
+│  passes: namespace, test-path (tests/k6), test-script,                │
+│          CUSTOM_DATA_OBJECT, cpu/mem requests+limits, influxdb URL    │
+│  ── mode A: aks-k6         → 1 standalone k6 pod                      │
+│  ── mode B: aks-k6-operator→ k6 Operator + N agent pods (distributed) │
+└───────────────┬──────────────────────────────────────────────────────┘
+                ▼
+┌──────────────────── KUBERNETES CLUSTER · YOUR NAMESPACE ─────────────┐
+│                                                                       │
+│   ┌──────────────┐  load (same-ns)     ┌───────────────────────────┐ │
+│   │  k6 POD(s)   │───────────────────▶ │  k8s SERVICE → App pods   │ │
+│   │ (test-script │  http.get w/ token  │  (system under test)      │ │
+│   │  + main.js)  │◀─────────────────── │  scales via HPA on CPU    │ │
+│   └──────┬───────┘  responses          └───────────────────────────┘ │
+│          │ streams metrics (--out influxdb)                          │
+│          ▼                                                            │
+│   ┌──────────────────────────┐        ┌──────────────────────────┐   │
+│   │  InfluxDB service         │◀──────▶│  Grafana dashboards      │   │
+│   │  <svc>.<ns>:8086/loadtest │  reads │  p95, TPS, errors, VUs   │   │
+│   └──────────────────────────┘        └──────────────────────────┘   │
+│                                                                       │
+└──────────────────────────────────────────────────────────────────────┘
+                ▲
+                │ token
+   ┌────────────┴─────────────┐
+   │  Identity provider        │  bearer.js: client_credentials → JWT
+   │  (OAuth2 token endpoint)   │  refreshed 60s before expiry
+   └───────────────────────────┘`}</Code>
+              <div className="mt-6 grid gap-4 md:grid-cols-2">
+                {[
+                  {
+                    t: "Where is k6 hosted / orchestrated?",
+                    d: "Not on the GitHub runner — the runner action deploys k6 as a pod in your product's own namespace. Traffic goes k6 pod → k8s Service → app pods, all inside the same namespace, so you test the service in isolation.",
+                  },
+                  {
+                    t: "One pod vs. many (the operator)",
+                    d: "aks-k6 runs a single k6 pod — fine for most tests. For heavy/distributed load, aks-k6-operator uses the k6 Operator: it creates a TestRun custom resource and the controller fans the test out across N agent pods (k6-agents input).",
+                  },
+                  {
+                    t: "How the pod is requested & sized",
+                    d: "The action templates the pod/TestRun manifest and applies it to AKS_NAMESPACE with cpu/memory requests + limits (e.g. 250m/1000Mi). Requests get it scheduled; limits stop the load generator itself from becoming the bottleneck.",
+                  },
+                  {
+                    t: "How config reaches the pod",
+                    d: "The reusable workflow merges VUs, ramp-up, duration, think-time and K6_SECRETS into ONE CUSTOM_DATA_OBJECT env var. The script parses it at start — same image, any load profile, no rebuild per run.",
+                  },
+                  {
+                    t: "How results get out",
+                    d: "k6 runs with --out influxdb pointed at a cluster-internal InfluxDB service on :8086/loadtest. Grafana reads InfluxDB, so every run is a live, historical dashboard — not a console dump.",
+                  },
+                ].map((x) => (
+                  <div key={x.t} className="rounded-xl border border-slate-200 p-4 dark:border-white/10">
+                    <p className="font-semibold text-primary">{x.t}</p>
+                    <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{x.d}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Reveal>
+        </div>
+
+        {/* Setup from scratch */}
+        <div className="container-page">
+          <Reveal>
+            <div className="card">
+              <h2 className="flex items-center gap-2 text-2xl font-bold text-primary">
+                <ListChecks className="h-6 w-6 text-accent" /> Setting it up from scratch — the checklist
+              </h2>
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                If you were starting with an empty repo, this is the exact order I&apos;d do it
+                in. Steps 1–4 you write once; step 5 you run forever.
+              </p>
+              <ol className="mt-4 space-y-3">
+                {[
+                  {
+                    h: "1. Add the k6 scripts to your repo",
+                    d: "Create tests/k6/<scenario>/ with main.js, action.js, bearer.js and the test-scripts (smoke/sanity/load). Put your test data CSV under data/. This is the only test logic you own.",
+                  },
+                  {
+                    h: "2. Create the per-environment .env file",
+                    d: "Add .github/workflows/.dev-euwe.env with the four vital values: ARM_CLIENT_ID (the workload/service-principal identity), AKS_REGION (e.g. euwe), AKS_TIER (npr/prd), AKS_NAMESPACE (your app's namespace). One file per environment-region.",
+                  },
+                  {
+                    h: "3. Wire up identity + secrets",
+                    d: "Register the service principal for OIDC federated login (so no static credentials live in GitHub), grant it access to your namespace, and add K6_SECRETS (a JSON blob) plus any client id/secret as repo/environment secrets.",
+                  },
+                  {
+                    h: "4. Add the thin caller workflow",
+                    d: "Create .github/workflows/on-demand-perftest.yml with workflow_dispatch inputs, and a job that uses: the central reusable workflow, forwarding environment-region, test-script, VUs, ramp-up, duration, think-time and secrets. ~20 lines total.",
+                  },
+                  {
+                    h: "5. Run it",
+                    d: "Actions tab → pick the workflow → Run workflow → choose environment + load profile. The reusable workflow logs into the cluster, deploys the k6 pod in your namespace, drives your Service, and streams live metrics to Grafana via InfluxDB.",
+                  },
+                ].map((s) => (
+                  <li key={s.h} className="rounded-xl border border-slate-200 p-4 dark:border-white/10">
+                    <p className="font-semibold text-primary">{s.h}</p>
+                    <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{s.d}</p>
+                  </li>
+                ))}
+              </ol>
+              <div className="mt-6 rounded-xl bg-primary/5 p-4">
+                <p className="text-sm font-semibold text-primary">The vital configuration, in one place</p>
+                <Code>{`# .github/workflows/.dev-euwe.env   ← the 4 values that decide WHERE the test runs
+ARM_CLIENT_ID=<workload-identity-app-id>   # who you authenticate as (OIDC)
+AKS_REGION=euwe                            # which regional cluster
+AKS_TIER=npr                               # non-prod / prod tier
+AKS_NAMESPACE=<your-app-namespace>         # where the k6 pod is deployed
+
+# repo/environment secrets
+K6_SECRETS={"CLIENT_SECRET":"...", ...}    # merged into the k6 data object`}</Code>
+              </div>
+            </div>
           </Reveal>
         </div>
 
