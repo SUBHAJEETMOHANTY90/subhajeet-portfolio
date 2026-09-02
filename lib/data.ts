@@ -338,8 +338,8 @@ export const education = [
 export const certifications = [
   { name: "Claude Builder Certification", org: "Anthropic", date: "2026", credentialId: "", file: "", badgeId: "1fa5e443-55ab-4bc1-badc-00b6639bc89f" },
   { name: "ISTQB Certified Tester", org: "ISTQB", date: "", credentialId: "", file: "", badgeId: "" },
-  { name: "Microsoft Certified: Azure Fundamentals (AZ-900)", org: "Microsoft", date: "", credentialId: "", file: "", badgeId: "" },
-  { name: "Microsoft Certified: Azure Administrator Associate (AZ-104)", org: "Microsoft", date: "", credentialId: "", file: "", badgeId: "" },
+  { name: "Microsoft Certified: Azure Fundamentals (AZ-900)", org: "Microsoft", date: "", credentialId: "", file: "", badgeId: "b8a09ed2-4f52-42a4-8b72-c34282d7eeb8" },
+  { name: "Microsoft Certified: Azure Administrator Associate (AZ-104)", org: "Microsoft", date: "", credentialId: "", file: "", badgeId: "891c46dd-3ef7-4248-b7c6-dda766b924a2" },
 ];
 
 export const successStories = [
