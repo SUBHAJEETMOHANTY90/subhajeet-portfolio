@@ -15,6 +15,9 @@ import {
   Workflow,
   Boxes,
   ListChecks,
+  Sparkles,
+  BrainCircuit,
+  FileText,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -556,6 +559,116 @@ K6_SECRETS={"CLIENT_SECRET":"...", ...}    # merged into the k6 data object`}</C
                 <strong>release gate</strong>: green means ship, red means investigate — no
                 spreadsheet, no guesswork.
               </p>
+            </div>
+          </Reveal>
+        </div>
+
+        {/* Step 10 - AI reporting & analysis */}
+        <div className="container-page">
+          <Reveal>
+            <h2 className="flex items-center gap-2 text-2xl font-bold text-primary">
+              <Sparkles className="h-6 w-6 text-accent" /> 10. Auto-report &amp; AI analysis
+            </h2>
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+              A raw k6 result or a Grafana panel still needs a human to interpret it. The last
+              piece of the template turns numbers into a <strong>written verdict</strong>: pull
+              the metrics after each run, feed them to an LLM with the right context, and get a
+              plain-English report — pass/fail, what regressed, and the likely root cause. If
+              the app emits <strong>OpenTelemetry</strong>, the same analysis can correlate load
+              results with traces and with <strong>SignalFx / Splunk Observability</strong>{" "}
+              signals for a full picture.
+            </p>
+          </Reveal>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {[
+              {
+                icon: FileText,
+                t: "1. Collect the evidence",
+                d: "After the run, gather k6 summary metrics (p95/p99, error rate, TPS, checks) from the InfluxDB/JSON output — plus the run parameters (VUs, ramp-up, duration) so the report is self-describing.",
+              },
+              {
+                icon: Activity,
+                t: "2. Pull observability signals",
+                d: "If OpenTelemetry is enabled, query the same time window for traces and RED/USE metrics. From SignalFx / Splunk Observability, pull service latency, error rate, and infra saturation (CPU, memory, GC, pod restarts).",
+              },
+              {
+                icon: BrainCircuit,
+                t: "3. Let AI write the verdict",
+                d: "Feed metrics + signals + your SLAs to an LLM with a strict prompt. It returns a structured report: PASS/FAIL vs thresholds, top regressions, correlated bottleneck, and a suggested next action.",
+              },
+            ].map((x) => (
+              <Reveal key={x.t}>
+                <div className="card h-full">
+                  <h3 className="flex items-center gap-2 font-semibold">
+                    <x.icon className="h-5 w-5 text-accent" /> {x.t}
+                  </h3>
+                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{x.d}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          <Reveal>
+            <div className="mt-6 card">
+              <p className="text-sm font-semibold text-primary">The analysis flow</p>
+              <Code>{`k6 run ──► results (InfluxDB / JSON summary: p95, p99, errors, TPS, checks)
+                    │
+   OpenTelemetry ──┤  traces + RED/USE metrics for the SAME time window
+   SignalFx /      │  service latency, error rate, saturation (CPU/mem/GC/restarts)
+   Splunk Obs. ────┘
+                    ▼
+        build a compact context payload (metrics + SLAs + run params)
+                    ▼
+        LLM  (strict prompt: "compare to SLA, find regressions & root cause")
+                    ▼
+        Markdown / PDF report ──► posted to the PR, Teams/Slack, or the run summary`}</Code>
+
+              <p className="mt-4 text-sm font-semibold text-primary">Example prompt skeleton</p>
+              <Code>{`SYSTEM: You are a senior performance engineer. Be precise and conservative.
+Given the k6 result, OpenTelemetry traces and SignalFx metrics for the same
+window, and the SLA thresholds, produce:
+  1. VERDICT: PASS or FAIL (against each SLA)
+  2. KEY REGRESSIONS: metric, before → after, % change
+  3. LIKELY ROOT CAUSE: correlate latency spikes with traces / saturation
+  4. NEXT ACTION: one concrete recommendation
+Only use the data provided. Flag anything inconclusive.
+
+USER: {
+  "run": { "vus": 50, "rampup": "2m", "duration": "10m" },
+  "k6":  { "p95_ms": 812, "p99_ms": 1430, "error_rate": 0.014, "tps": 240 },
+  "sla": { "p95_ms": 800, "error_rate": 0.01 },
+  "otel_top_span": { "name": "db.query.getEntity", "p95_ms": 610 },
+  "signalfx": { "cpu_pct": 88, "gc_pause_ms_p95": 120, "pod_restarts": 0 }
+}`}</Code>
+            </div>
+          </Reveal>
+
+          <Reveal>
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              {[
+                {
+                  t: "Why OpenTelemetry matters here",
+                  d: "Load numbers tell you THAT it got slow; OTel traces tell you WHERE. With spans in the same window, the AI can point at the exact hop — a DB call, a downstream API, a lock — instead of guessing.",
+                },
+                {
+                  t: "SignalFx / Splunk Observability",
+                  d: "It supplies the infra side of the story: CPU saturation, memory pressure, GC pauses, pod restarts. Correlating these with the k6 timeline separates 'the app is slow' from 'the app is starved'.",
+                },
+                {
+                  t: "Deterministic first, AI second",
+                  d: "Thresholds still decide PASS/FAIL (step 5). The AI explains and prioritises — it never overrides the gate. That keeps results trustworthy and auditable.",
+                },
+                {
+                  t: "Where the report lands",
+                  d: "Rendered as Markdown/PDF and attached to the workflow run, posted on the PR, or pushed to a Teams/Slack channel — so a release decision needs no manual dashboard reading.",
+                },
+              ].map((x) => (
+                <div key={x.t} className="rounded-xl border border-slate-200 p-4 dark:border-white/10">
+                  <p className="font-semibold text-primary">{x.t}</p>
+                  <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{x.d}</p>
+                </div>
+              ))}
             </div>
           </Reveal>
         </div>
