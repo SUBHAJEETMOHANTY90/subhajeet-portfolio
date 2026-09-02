@@ -45,7 +45,7 @@ export default function PerfTemplatePage() {
           <Reveal>
             <div className="card border-l-4 border-accent">
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                <strong>What you'll build:</strong> a self-contained k6 template where the{" "}
+                <strong>What you&apos;ll build:</strong> a self-contained k6 template where the{" "}
                 <em>load model</em>, <em>test data</em>, <em>auth</em> and <em>environment</em>{" "}
                 are all configuration — so the same scripts run as a 1-user smoke check or a
                 thousand-user load test just by changing inputs. Everything below is generic;
@@ -116,7 +116,7 @@ main.js                    (one iteration = one business action)
 Results streamed to a time-series DB (InfluxDB) → dashboards (Grafana)`}</Code>
               <p className="mt-4 text-sm text-slate-600 dark:text-slate-400">
                 <strong>Key idea:</strong> the <em>load model</em> lives in each{" "}
-                <code>test-script</code>'s <code>options</code>, while the{" "}
+                <code>test-script</code>&apos;s <code>options</code>, while the{" "}
                 <em>business action</em> lives once in <code>main.js</code> + <code>action.js</code>.
                 Swap the script to change the shape of the load; the request logic never changes.
               </p>
@@ -179,7 +179,7 @@ export default function () {
         <div className="container-page">
           <Reveal>
             <h2 className="flex items-center gap-2 text-2xl font-bold text-primary">
-              <KeyRound className="h-6 w-6 text-accent" /> 4. Handle auth so soak tests don't die
+              <KeyRound className="h-6 w-6 text-accent" /> 4. Handle auth so soak tests don&apos;t die
             </h2>
             <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
               Fetch an OAuth2 client-credentials token and refresh it{" "}
@@ -209,7 +209,7 @@ export const main = (row) => {
             </h2>
             <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
               Ramp up gradually, hold steady, then ramp down. Add thresholds so the test{" "}
-              <em>fails itself</em> when SLAs are breached — that's what makes it a gate.
+              <em>fails itself</em> when SLAs are breached — that&apos;s what makes it a gate.
             </p>
             <Code>{`import { main } from './main.js'
 
