@@ -361,6 +361,7 @@ export const navLinks = [
   { href: "/skills", label: "Skills" },
   { href: "/achievements", label: "Achievements" },
   { href: "/case-studies", label: "Case Studies" },
+  { href: "/architecture", label: "Architecture" },
   { href: "/war-stories", label: "War Stories" },
   { href: "/success-stories", label: "Top 10" },
   { href: "/certifications", label: "Certifications" },
