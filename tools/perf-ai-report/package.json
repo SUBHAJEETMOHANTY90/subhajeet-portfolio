@@ -1,0 +1,17 @@
+{
+  "name": "perf-ai-report",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Collect k6 (client-side) + server-side metrics (Prometheus/OTel, SignalFx), apply a deterministic SLA gate, then generate an AI-written performance analysis report.",
+  "bin": {
+    "perf-ai-report": "./index.mjs"
+  },
+  "scripts": {
+    "demo": "node index.mjs --config sample/config.json --k6 sample/k6-summary.json --offline --out sample/REPORT.md",
+    "start": "node index.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

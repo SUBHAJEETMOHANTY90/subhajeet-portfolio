@@ -569,33 +569,197 @@ K6_SECRETS={"CLIENT_SECRET":"...", ...}    # merged into the k6 data object`}</C
             <h2 className="flex items-center gap-2 text-2xl font-bold text-primary">
               <Sparkles className="h-6 w-6 text-accent" /> 10. Auto-report &amp; AI analysis
             </h2>
-            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-              A raw k6 result or a Grafana panel still needs a human to interpret it. The last
-              piece of the template turns numbers into a <strong>written verdict</strong>: pull
-              the metrics after each run, feed them to an LLM with the right context, and get a
-              plain-English report — pass/fail, what regressed, and the likely root cause. If
-              the app emits <strong>OpenTelemetry</strong>, the same analysis can correlate load
-              results with traces and with <strong>SignalFx / Splunk Observability</strong>{" "}
-              signals for a full picture.
-            </p>
-          </Reveal>
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                A raw k6 result or a Grafana panel still needs a human to interpret it. The last
+                piece of the template turns numbers into a <strong>written verdict</strong>. The
+                key is that it analyses <strong>two sides at once</strong>: the{" "}
+                <em>client-side</em> load result (what the user experienced) and the{" "}
+                <em>server-side</em> metrics from <strong>OpenTelemetry / Prometheus</strong> and{" "}
+                <strong>SignalFx / Splunk Observability</strong> (why the system behaved that
+                way) — then correlates them before an LLM ever sees the data.
+              </p>
+            </Reveal>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            <Reveal>
+              <div className="mt-6 card">
+                <p className="text-sm font-semibold text-primary">
+                  The one comparison that matters: client vs server
+                </p>
+                <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                  k6 measures from outside; the service measures from inside. The{" "}
+                  <strong>gap between the two p95s</strong> immediately narrows the search:
+                </p>
+                <Code>{`client p95 (k6)  1042 ms
+server p95 (OTel)  934 ms      → gap 10%  = the APP owns the latency
+                               → look at DB, GC, downstream calls
+
+client p95 (k6)  1042 ms
+server p95 (OTel)  180 ms      → gap 83%  = time is OUTSIDE the app
+                               → network, ingress, queueing, saturated load generator`}</Code>
+              </div>
+            </Reveal>
+
+            <Reveal>
+              <h3 className="mt-8 text-lg font-bold text-primary">
+                What gets collected on each side
+              </h3>
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                <div className="rounded-xl border border-slate-200 p-4 dark:border-white/10">
+                  <p className="font-semibold text-accent">Client-side — k6</p>
+                  <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                    From <code>k6 run --summary-export=summary.json</code>: p95/p99/max latency,{" "}
+                    <code>http_req_waiting</code> (TTFB, isolates server time from network),
+                    error rate, throughput, VUs, threshold results.
+                  </p>
+                </div>
+                <div className="rounded-xl border border-slate-200 p-4 dark:border-white/10">
+                  <p className="font-semibold text-accent">Server-side — Prometheus / OTel</p>
+                  <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                    PromQL over the exact test window: service p95/p99 and 5xx rate (RED), CPU
+                    utilisation &amp; <strong>throttling</strong>, memory, GC pause, heap, Node
+                    event-loop lag, DB &amp; downstream p95, connection-pool saturation, pod
+                    restarts and replica count (USE).
+                  </p>
+                </div>
+                <div className="rounded-xl border border-slate-200 p-4 dark:border-white/10">
+                  <p className="font-semibold text-accent">Server-side — SignalFx / Splunk Obs.</p>
+                  <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                    SignalFlow programs executed for the same start/stop window — service
+                    latency, error rate, container CPU/memory utilisation, restarts. Used to fill
+                    any gaps Prometheus does not cover.
+                  </p>
+                </div>
+                <div className="rounded-xl border border-slate-200 p-4 dark:border-white/10">
+                  <p className="font-semibold text-accent">Traces — Tempo / Jaeger</p>
+                  <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                    Slowest spans in the window, grouped by operation and ranked by total time
+                    contributed — so the report can name the exact hop (<code>db.query.…</code>,
+                    a downstream API, a lock) instead of guessing.
+                  </p>
+                </div>
+              </div>
+            </Reveal>
+
+            <Reveal>
+              <h3 className="mt-8 text-lg font-bold text-primary">
+                The pipeline: correlate → gate → explain
+              </h3>
+              <Code>{`k6 summary ──┐
+Prometheus ──┤
+SignalFx   ──┼─► correlate ──► SLA gate (deterministic) ──► LLM narrative ──► Markdown
+Traces     ──┘       │                   │                      │
+                     │                   └─ decides PASS/FAIL   └─ explains & prioritises
+                     └─ rules produce: evidence → hypothesis → action`}</Code>
+              <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
+                <strong>Order matters.</strong> Rules run first and produce cited, reproducible
+                findings; thresholds then decide PASS/FAIL; the model is handed the verdict plus
+                the findings and told to explain — <em>never</em> to re-judge. That keeps the
+                gate auditable and stops the AI from hallucinating a pass.
+              </p>
+            </Reveal>
+
+            <Reveal>
+              <h3 className="mt-8 text-lg font-bold text-primary">
+                The correlation rules (this is the real analysis)
+              </h3>
+              <div className="mt-4 overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="text-slate-500">
+                    <tr>
+                      <th className="py-2 pr-4 font-semibold">Rule</th>
+                      <th className="py-2 font-semibold">What it catches</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-slate-600 dark:text-slate-400">
+                    {[
+                      ["client p95 ≫ server p95", "Network / ingress / queueing, or a saturated load generator"],
+                      ["CPU throttling > 10%", "Limits set too low — latency spikes while CPU looks 'fine'"],
+                      ["CPU > 85%", "Compute-bound; check whether the HPA hit its ceiling"],
+                      ["GC pause > 15% of p95", "Allocation churn or heap sizing stalling request threads"],
+                      ["heap > 85%", "Memory ceiling, OOM risk at higher load"],
+                      ["event-loop lag > 50 ms", "Blocking synchronous work in Node.js"],
+                      ["DB p95 > 40% of server p95", "Missing index, N+1 pattern, or lock contention"],
+                      ["downstream p95 > 40%", "A dependency — not your service — is the bottleneck"],
+                      ["pool saturation > 80%", "Connection-pool exhaustion (latency up, CPU flat)"],
+                      ["pod restarts > 0", "OOMKill / liveness failure — the run is untrustworthy"],
+                      ["client errors ≫ server 5xx", "Timeouts, resets, or ingress-level rejection"],
+                    ].map(([r, w]) => (
+                      <tr key={r} className="border-t border-slate-200 dark:border-white/10">
+                        <td className="py-2 pr-4 font-mono text-xs text-accent">{r}</td>
+                        <td className="py-2">{w}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Reveal>
+
+            <Reveal>
+              <h3 className="mt-8 text-lg font-bold text-primary">The payload the model receives</h3>
+              <Code>{`{
+  "run":   { "service": "entity-api", "vus": 50, "rampup": "2m", "duration": "10m" },
+  "gate":  { "verdict": "FAIL", "passed": 1, "failed": 6,
+             "checks": [ { "metric": "p95_ms", "actual": 1042.6, "op": "<", "value": 800,
+                           "status": "FAIL", "deltaPct": 30.3 } ] },
+  "k6":     { "p95_ms": 1042.6, "p99_ms": 2310.9, "error_rate": 0.0243, "tps": 238.7 },
+  "server": { "server_p95_ms": 934, "cpu_utilization_pct": 91.4, "cpu_throttle_pct": 27.8,
+              "gc_pause_p95_ms": 186, "heap_used_pct": 88.3, "db_p95_ms": 601,
+              "connection_pool_saturation_pct": 94, "pod_restarts": 1 },
+  "traces": [ { "name": "db.query.getEntityByCode", "p95_ms": 601, "max_ms": 1890 } ],
+  "findings": [ { "severity": "HIGH", "title": "Container CPU throttling detected",
+                  "evidence": "...", "hypothesis": "...", "action": "..." } ]
+}`}</Code>
+
+              <p className="mt-4 text-sm font-semibold text-primary">System prompt</p>
+              <Code>{`You are a senior performance engineer writing a release-readiness report.
+
+- The PASS/FAIL verdict is already decided by deterministic SLA thresholds.
+  Never contradict it.
+- Use ONLY the data provided. If evidence is missing, say so explicitly.
+- Correlate client-side (k6) numbers with server-side metrics and traces.
+- Be specific and quantitative. Lead with the single most likely bottleneck.
+
+Sections: Executive summary · What the data shows · Most likely root cause
+          · Recommended actions · Confidence & gaps`}</Code>
+            </Reveal>
+
+            <Reveal>
+              <h3 className="mt-8 text-lg font-bold text-primary">Wiring it into the pipeline</h3>
+              <Code>{`- name: Run load test
+  run: k6 run --summary-export=summary.json tests/k6/getEntityByCode/load-test.js
+
+- name: Generate AI performance report
+  env:
+    OPENAI_API_KEY: ${dollar}{{ secrets.OPENAI_API_KEY }}
+    PROM_TOKEN:     ${dollar}{{ secrets.PROM_TOKEN }}
+    SFX_TOKEN:      ${dollar}{{ secrets.SFX_TOKEN }}
+  run: |
+    node tools/perf-ai-report/index.mjs \\
+      --config perf/report-config.json \\
+      --k6 summary.json \\
+      --out REPORT.md \\
+      --fail-on-gate          # exit 1 when the gate fails
+
+# the report is appended to $GITHUB_STEP_SUMMARY automatically,
+# so it renders on the workflow run page — and can be posted to a PR or Teams.`}</Code>
+            </Reveal>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
             {[
               {
                 icon: FileText,
                 t: "1. Collect the evidence",
-                d: "After the run, gather k6 summary metrics (p95/p99, error rate, TPS, checks) from the InfluxDB/JSON output — plus the run parameters (VUs, ramp-up, duration) so the report is self-describing.",
+                d: "k6 summary (p95/p99, TTFB, error rate, TPS, thresholds) plus the run parameters, so the report is self-describing and comparable run to run.",
               },
               {
                 icon: Activity,
-                t: "2. Pull observability signals",
-                d: "If OpenTelemetry is enabled, query the same time window for traces and RED/USE metrics. From SignalFx / Splunk Observability, pull service latency, error rate, and infra saturation (CPU, memory, GC, pod restarts).",
+                t: "2. Pull server-side signals",
+                d: "PromQL/SignalFlow queries scoped to the exact test window: RED metrics from OTel, USE metrics from the cluster, and the slowest spans from traces.",
               },
               {
                 icon: BrainCircuit,
-                t: "3. Let AI write the verdict",
-                d: "Feed metrics + signals + your SLAs to an LLM with a strict prompt. It returns a structured report: PASS/FAIL vs thresholds, top regressions, correlated bottleneck, and a suggested next action.",
+                t: "3. Gate, then explain",
+                d: "Thresholds decide PASS/FAIL deterministically; correlation rules produce cited findings; the LLM turns them into a prioritised, readable report.",
               },
             ].map((x) => (
               <Reveal key={x.t}>
@@ -611,36 +775,40 @@ K6_SECRETS={"CLIENT_SECRET":"...", ...}    # merged into the k6 data object`}</C
 
           <Reveal>
             <div className="mt-6 card">
-              <p className="text-sm font-semibold text-primary">The analysis flow</p>
-              <Code>{`k6 run ──► results (InfluxDB / JSON summary: p95, p99, errors, TPS, checks)
-                    │
-   OpenTelemetry ──┤  traces + RED/USE metrics for the SAME time window
-   SignalFx /      │  service latency, error rate, saturation (CPU/mem/GC/restarts)
-   Splunk Obs. ────┘
-                    ▼
-        build a compact context payload (metrics + SLAs + run params)
-                    ▼
-        LLM  (strict prompt: "compare to SLA, find regressions & root cause")
-                    ▼
-        Markdown / PDF report ──► posted to the PR, Teams/Slack, or the run summary`}</Code>
+              <p className="text-sm font-semibold text-primary">
+                What comes out — a real generated report
+              </p>
+              <Code>{`# Performance Report — entity-api
+> Verdict: ❌ FAIL · dev-euwe · load-test.js
 
-              <p className="mt-4 text-sm font-semibold text-primary">Example prompt skeleton</p>
-              <Code>{`SYSTEM: You are a senior performance engineer. Be precise and conservative.
-Given the k6 result, OpenTelemetry traces and SignalFx metrics for the same
-window, and the SLA thresholds, produce:
-  1. VERDICT: PASS or FAIL (against each SLA)
-  2. KEY REGRESSIONS: metric, before → after, % change
-  3. LIKELY ROOT CAUSE: correlate latency spikes with traces / saturation
-  4. NEXT ACTION: one concrete recommendation
-Only use the data provided. Flag anything inconclusive.
+## SLA gate (deterministic)
+| Metric                  | Actual          | SLA    | Result  |
+| Client p95 latency (ms) | 1042.6 (+30.3%) | < 800  | ❌ FAIL |
+| Error rate              | 0.0243 (+143%)  | < 0.01 | ❌ FAIL |
+| Server-side p95 (ms)    | 934 (+55.7%)    | < 600  | ❌ FAIL |
+| Throughput (req/s)      | 238.7 (+19.3%)  | > 200  | ✅ PASS |
 
-USER: {
-  "run": { "vus": 50, "rampup": "2m", "duration": "10m" },
-  "k6":  { "p95_ms": 812, "p99_ms": 1430, "error_rate": 0.014, "tps": 240 },
-  "sla": { "p95_ms": 800, "error_rate": 0.01 },
-  "otel_top_span": { "name": "db.query.getEntity", "p95_ms": 610 },
-  "signalfx": { "cpu_pct": 88, "gc_pause_ms_p95": 120, "pod_restarts": 0 }
-}`}</Code>
+## Client-side vs server-side
+| Signal      | Client (k6) | Server (OTel / SignalFx) |
+| p95 latency | 1042.6 ms   | 934 ms                   |
+| Error rate  | 2.43%       | 2.29%                    |
+
+## Correlated findings
+### 🔴 Container CPU throttling detected
+- Evidence:   CPU was throttled 27.8% of scheduling periods during the test.
+- Hypothesis: Limits are too close to demand — the kernel pauses the workload,
+              which shows up as latency spikes rather than high CPU.
+- Action:     Raise the CPU limit and re-run.
+
+### 🔴 Database time dominates the request
+- Evidence:   DB p95 601 ms is 64.3% of server p95 934 ms.
+- Hypothesis: Missing index, N+1 query, or lock contention under concurrency.
+- Action:     Check execution plans for the hot predicate.`}</Code>
+              <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
+                Every finding carries <strong>evidence → hypothesis → action</strong>, so the
+                report is reviewable rather than a black box — and an engineer can disagree with
+                it using the same numbers.
+              </p>
             </div>
           </Reveal>
 
