@@ -11,3 +11,6 @@ next-env.d.ts
 
 debug.log
 extract_pdf.js
+
+# local-only, never publish
+job-intel/

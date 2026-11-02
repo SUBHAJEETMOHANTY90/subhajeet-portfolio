@@ -45,6 +45,9 @@ jobs:
         # base_path is provided by configure-pages, e.g. "/subhajeet-portfolio"
         env:
           NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          # Visitor analytics. Set under Settings > Secrets and variables >
+          # Actions > Variables. Leave unset to build without analytics.
+          NEXT_PUBLIC_GOATCOUNTER_CODE: ${{ vars.GOATCOUNTER_CODE }}
         run: npm run build
 
       - name: Upload artifact
